@@ -24,9 +24,11 @@
  *  Gli `id` devono essere unici. L'ordine dell'array e' l'ordine in home.
  *
  *  NOTA: al momento foto e musica sono MOCKUP segnaposto, gia' dentro il
- *  progetto: sfumature colorate in /public/photos e brani demo in
- *  /public/audio. Per usare il materiale vero ti basta sovrascrivere
- *  quei file (stesso nome) oppure cambiare qui sotto i percorsi.
+ *  progetto: fotografie di esempio in /public/photos (scaricate una volta
+ *  sola, quindi il sito non dipende da internet) e brani demo generati in
+ *  /public/audio. Per usare il materiale vero ti basta sovrascrivere quei
+ *  file mantenendo gli stessi nomi (01.jpg, 02.jpg, ...) oppure cambiare
+ *  qui sotto i percorsi.
  * ========================================================================== */
 
 export type Fotografia = {

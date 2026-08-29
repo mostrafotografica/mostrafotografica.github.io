@@ -99,12 +99,21 @@ Blocco `MENU` in fondo a `config/mostra.ts`.
 
 Foto e musica sono **segnaposto**, da sostituire con i file veri:
 
-- le foto arrivano da `picsum.photos` (immagini casuali online)
-- i brani sono cinque tracce ambient generate apposta, in `public/audio/`
+- `public/photos/01.jpg` … `20.jpg` — fotografie di esempio (1200x1600),
+  prese da [Lorem Picsum](https://picsum.photos) e **salvate dentro il
+  progetto**: il sito non dipende da internet per mostrarle
+- `public/audio/demo-01.mp3` … `demo-05.mp3` — cinque tracce ambient
+  generate apposta, usate a rotazione
 
-Quando metti i tuoi file in `public/photos/` e `public/audio/` e aggiorni
-i percorsi nella configurazione, i segnaposto smettono di essere usati.
-A quel punto puoi anche cancellare i `demo-*.mp3`.
+Per mettere il materiale vero ti basta **sovrascrivere quei file tenendo lo
+stesso nome**: non devi toccare la configurazione.
+
+> **Se sostituisci una foto e continui a vedere quella vecchia**, non e' un
+> errore tuo: il server di sviluppo tiene in memoria le immagini gia'
+> ottimizzate, e il nome del file non e' cambiato. Riavvia `npm run dev`
+> (e ricarica la pagina saltando la cache) e comparira' quella nuova. In alternativa cambia i
+percorsi in `config/mostra.ts`. Quando hai finito puoi cancellare i
+`demo-*.mp3` rimasti inutilizzati.
 
 ---
 
