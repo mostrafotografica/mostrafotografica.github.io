@@ -4,7 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { MOSTRA, NUMERO_FOTO, numeroFormattato, type Fotografia } from "@/config/mostra";
-import { animazioniAttive, gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, useModoAnimazioni } from "@/lib/gsap";
 import Lettore from "@/components/Lettore";
 
 type Props = {
@@ -15,12 +15,22 @@ type Props = {
 
 /** La pagina della singola fotografia: quella che si apre dal QR code. */
 export default function Opera({ opera, precedente, successiva }: Props) {
+  const modo = useModoAnimazioni();
   const radice = useRef<HTMLElement>(null);
   const cornice = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
-      if (!animazioniAttive()) return;
+      if (modo === "spente") return;
+
+      if (modo === "ridotte") {
+        gsap.fromTo(
+          [".opera-numero", ".opera-riga", ".opera-dettaglio", ".opera-blocco"],
+          { opacity: 0 },
+          { opacity: 1, duration: 0.55, stagger: 0.05, ease: "power1.out" }
+        );
+        return;
+      }
 
       const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
 
@@ -56,7 +66,7 @@ export default function Opera({ opera, precedente, successiva }: Props) {
         );
       });
     },
-    { scope: radice, dependencies: [opera.id] }
+    { scope: radice, dependencies: [opera.id, modo] }
   );
 
   return (
@@ -153,7 +163,8 @@ export default function Opera({ opera, precedente, successiva }: Props) {
         </p>
       </div>
 
-      <Lettore opera={opera} />
+      {/* la key rimonta il lettore a ogni opera: stato e audio ripartono puliti */}
+      <Lettore key={opera.id} opera={opera} />
     </article>
   );
 }

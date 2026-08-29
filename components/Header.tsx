@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { MENU, MOSTRA, NUMERO_FOTO } from "@/config/mostra";
-import { animazioniAttive, gsap, ScrollTrigger, useGSAP } from "@/lib/gsap";
+import { gsap, modoAnimazioni, ScrollTrigger, useGSAP } from "@/lib/gsap";
 
 export default function Header() {
   const [aperto, setAperto] = useState(false);
@@ -21,10 +21,13 @@ export default function Header() {
     if (aperto) gsap.set(barra.current, { yPercent: 0 });
   }, [aperto]);
 
-  /* Il menu si chiude quando cambio pagina */
-  useEffect(() => {
+  /* Il menu si chiude quando cambio pagina (anche col tasto indietro):
+     stato ricalcolato in fase di render, senza effetti a cascata. */
+  const [pathPrecedente, setPathPrecedente] = useState(pathname);
+  if (pathname !== pathPrecedente) {
+    setPathPrecedente(pathname);
     setAperto(false);
-  }, [pathname]);
+  }
 
   /* Esc per chiudere + blocco dello scroll di fondo */
   useEffect(() => {
@@ -46,7 +49,8 @@ export default function Header() {
         end: "max",
         onUpdate: (self) => {
           setScrollato(self.scroll() > 64);
-          if (apertoRef.current || !animazioniAttive()) return;
+          /* La barra che si ritira e"e' movimento: solo a pieno regime" */
+          if (apertoRef.current || modoAnimazioni() !== "piene") return;
           gsap.to(barra.current, {
             yPercent: self.direction === 1 ? -130 : 0,
             duration: 0.5,
@@ -79,18 +83,50 @@ export default function Header() {
     const voci = el.querySelectorAll(".menu-voce");
     const coda = el.querySelectorAll(".menu-coda");
 
-    /* Senza animazioni il menu funziona lo stesso: appare e sparisce
-       istantaneamente, senza mai restare a meta' strada. */
-    if (!animazioniAttive()) {
-      gsap.set(el, { xPercent: aperto ? 0 : 100, pointerEvents: aperto ? "auto" : "none" });
+    /* NOTA sulle trasformazioni del pannello: la classe `translate-x-full`
+       di Tailwind 4 usa la proprieta' CSS `translate`, non `transform`.
+       Quando GSAP prende in mano l'elemento legge la matrice gia' calcolata
+       e si porta dietro quello scostamento come `x` fisso (una larghezza di
+       schermo), lasciando il pannello fuori campo per tutta l'animazione.
+       Per questo ogni chiamata qui sotto dichiara esplicitamente `x: 0`:
+       la posizione la decide solo `xPercent`. */
+    const modo = modoAnimazioni();
+
+    /* Pagina non in primo piano: il menu funziona lo stesso, di scatto,
+       senza mai restare a meta' strada. */
+    if (modo === "spente") {
+      gsap.set(el, { xPercent: aperto ? 0 : 100, x: 0, opacity: 1, pointerEvents: aperto ? "auto" : "none" });
       gsap.set([...voci, ...coda], { clearProps: "all" });
       return;
+    }
+
+    /* Movimento ridotto: niente scorrimento laterale, solo dissolvenza. */
+    if (modo === "ridotte") {
+      const tl = gsap.timeline();
+      if (aperto) {
+        tl.set(el, { xPercent: 0, x: 0, pointerEvents: "auto" })
+          .fromTo(el, { opacity: 0 }, { opacity: 1, duration: 0.35 })
+          .fromTo([...voci, ...coda], { opacity: 0 }, { opacity: 1, duration: 0.3, stagger: 0.04 }, "-=0.15");
+      } else {
+        tl.to(el, {
+          opacity: 0,
+          duration: 0.3,
+          onComplete: () => gsap.set(el, { xPercent: 100, x: 0, opacity: 1, pointerEvents: "none" }),
+        });
+      }
+      return () => {
+        tl.kill();
+      };
     }
 
     if (aperto) {
       const tl = gsap.timeline();
       tl.set(el, { pointerEvents: "auto" })
-        .to(el, { xPercent: 0, duration: 0.85, ease: "expo.out" })
+        .fromTo(
+          el,
+          { xPercent: 100, x: 0 },
+          { xPercent: 0, x: 0, duration: 0.85, ease: "expo.out" }
+        )
         .fromTo(
           voci,
           { yPercent: 110, opacity: 0 },
@@ -110,6 +146,7 @@ export default function Header() {
 
     const tl = gsap.to(el, {
       xPercent: 100,
+      x: 0,
       duration: 0.55,
       ease: "power3.inOut",
       onComplete: () => gsap.set(el, { pointerEvents: "none" }),

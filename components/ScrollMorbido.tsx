@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 import { usePathname } from "next/navigation";
 import Lenis from "lenis";
-import { animazioniAttive, gsap, ScrollTrigger } from "@/lib/gsap";
+import { gsap, ScrollTrigger, useModoAnimazioni } from "@/lib/gsap";
 
 /**
  * Scroll morbido (Lenis) agganciato al ticker di GSAP, cosi' scroll e
@@ -11,11 +11,13 @@ import { animazioniAttive, gsap, ScrollTrigger } from "@/lib/gsap";
  * Su touch lasciamo l'inerzia nativa del telefono, che resta la piu' fluida.
  */
 export default function ScrollMorbido({ children }: { children: React.ReactNode }) {
+  const modo = useModoAnimazioni();
   const lenisRef = useRef<Lenis | null>(null);
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!animazioniAttive()) return;
+    /* Lo scorrimento morbido e' movimento: si accende solo a pieno regime */
+    if (modo !== "piene") return;
 
     const lenis = new Lenis({
       duration: 1.15,
@@ -37,7 +39,7 @@ export default function ScrollMorbido({ children }: { children: React.ReactNode 
       lenis.destroy();
       lenisRef.current = null;
     };
-  }, []);
+  }, [modo]);
 
   /* Ad ogni cambio pagina: si riparte dall'alto e si ricalcolano i trigger. */
   useEffect(() => {

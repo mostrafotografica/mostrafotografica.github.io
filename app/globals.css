@@ -130,12 +130,10 @@ button {
   background-color: var(--color-linea);
 }
 
+/* Con "riduci movimento" le comparse le gestisce GSAP con semplici
+   dissolvenze (vedi lib/gsap.ts): qui spegniamo solo transizioni e
+   animazioni CSS, che sono tutte decorative. */
 @media (prefers-reduced-motion: reduce) {
-  .gsap-nascosto {
-    opacity: 1 !important;
-    transform: none !important;
-  }
-
   * {
     animation-duration: 0.01ms !important;
     transition-duration: 0.01ms !important;

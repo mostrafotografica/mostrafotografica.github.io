@@ -15,6 +15,17 @@ npm run dev
 
 Poi apri http://localhost:3000
 
+### Provarlo dal telefono (consigliato: e' un sito per il telefono)
+
+Il terminale, all'avvio, stampa anche un indirizzo tipo
+`http://192.168.1.34:3000`: aprilo dal telefono, collegato allo stesso Wi-Fi.
+
+**Se il tuo computer cambia indirizzo IP** devi aggiungerlo a
+`allowedDevOrigins` in [`next.config.ts`](next.config.ts). In sviluppo Next
+rifiuta (errore 403) le richieste ai propri file JavaScript provenienti da
+indirizzi non autorizzati: la pagina si carica ma resta immobile, senza
+animazioni. Riguarda solo lo sviluppo, il sito pubblicato non ne risente.
+
 Per la versione definitiva:
 
 ```bash
@@ -119,8 +130,27 @@ il sito si aprirebbe **completamente nero**, con i contenuti presenti ma
 invisibili. C'e' anche una rete di sicurezza: se il codice delle animazioni
 non arriva entro 5 secondi, tutto viene mostrato comunque.
 
+Sono previste tre modalita' (`lib/gsap.ts`):
+
+| modalita' | quando | cosa fa |
+|-----------|--------|---------|
+| `piene`   | pagina in primo piano | tutte le animazioni |
+| `ridotte` | il dispositivo chiede meno movimento | solo dissolvenze brevi |
+| `spente`  | pagina non in primo piano | niente nascosto, niente animato |
+
 Se aggiungi animazioni tue, segui la stessa regola:
-`if (!animazioniAttive()) return;` e nessun `opacity: 0` fisso nel CSS.
+`if (modo === "spente") return;` e nessun `opacity: 0` fisso nel CSS.
+
+### Attenzione a Tailwind 4 + GSAP
+
+In Tailwind 4 le classi tipo `translate-x-full` e `scale-*` scrivono sulle
+proprieta' CSS `translate` / `scale`, che sono **separate** da `transform`.
+Quando GSAP prende in mano un elemento legge la matrice gia' calcolata e si
+porta dietro quello scostamento come valore fisso: l'animazione parte ma
+l'elemento resta spostato. Se animi `xPercent`/`yPercent` su un elemento che
+ha anche una classe di trasformazione Tailwind, dichiara sempre in modo
+esplicito anche `x: 0` / `y: 0` (vedi il pannello del menu in
+`components/Header.tsx`).
 
 ---
 

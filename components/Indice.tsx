@@ -4,33 +4,35 @@ import { useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { FOTOGRAFIE, numeroFormattato } from "@/config/mostra";
-import { animazioniAttive, gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, useModoAnimazioni } from "@/lib/gsap";
 
 /** L'indice della mostra: lista numerata, una riga per fotografia. */
 export default function Indice() {
+  const modo = useModoAnimazioni();
   const radice = useRef<HTMLElement>(null);
 
   useGSAP(
     () => {
-      if (!animazioniAttive()) return;
+      if (modo === "spente") return;
 
+      const ridotte = modo === "ridotte";
       const righe = gsap.utils.toArray<HTMLElement>(".indice-riga");
 
       righe.forEach((riga) => {
         gsap.fromTo(
           riga,
-          { y: 46, opacity: 0 },
+          { y: ridotte ? 0 : 46, opacity: 0 },
           {
             y: 0,
             opacity: 1,
-            duration: 1,
-            ease: "power3.out",
+            duration: ridotte ? 0.5 : 1,
+            ease: ridotte ? "power1.out" : "power3.out",
             scrollTrigger: { trigger: riga, start: "top 88%", once: true },
           }
         );
 
         /* Micro-parallasse dell'anteprima dentro la sua cornice */
-        const foto = riga.querySelector(".indice-foto");
+        const foto = ridotte ? null : riga.querySelector(".indice-foto");
         if (foto) {
           gsap.fromTo(
             foto,
@@ -46,17 +48,17 @@ export default function Indice() {
 
       gsap.fromTo(
         ".indice-intestazione",
-        { opacity: 0, y: 20 },
+        { opacity: 0, y: ridotte ? 0 : 20 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.9,
+          duration: ridotte ? 0.5 : 0.9,
           ease: "power3.out",
           scrollTrigger: { trigger: ".indice-intestazione", start: "top 92%", once: true },
         }
       );
     },
-    { scope: radice }
+    { dependencies: [modo], scope: radice }
   );
 
   return (

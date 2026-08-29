@@ -3,10 +3,11 @@
 import { useRef } from "react";
 import Image from "next/image";
 import { FOTOGRAFIE, MOSTRA, NUMERO_FOTO } from "@/config/mostra";
-import { animazioniAttive, gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, useModoAnimazioni } from "@/lib/gsap";
 
 /** Apertura della home: titolo che sale riga per riga sopra una foto che respira. */
 export default function Copertina() {
+  const modo = useModoAnimazioni();
   const radice = useRef<HTMLElement>(null);
   const sfondo = useRef<HTMLDivElement>(null);
   /* Il titolo viene spezzato parola per parola: cosi' l'animazione
@@ -16,7 +17,17 @@ export default function Copertina() {
 
   useGSAP(
     () => {
-      if (!animazioniAttive()) return;
+      if (modo === "spente") return;
+
+      /* Movimento ridotto: solo una dissolvenza, niente scorrimenti */
+      if (modo === "ridotte") {
+        gsap.fromTo(
+          [".copertina-foto", ".copertina-riga", ".copertina-meta"],
+          { opacity: 0 },
+          { opacity: 1, duration: 0.6, stagger: 0.07, ease: "power1.out" }
+        );
+        return;
+      }
 
       const tl = gsap.timeline({ defaults: { ease: "expo.out" } });
 
@@ -62,7 +73,7 @@ export default function Copertina() {
         },
       });
     },
-    { scope: radice }
+    { dependencies: [modo], scope: radice }
   );
 
   return (

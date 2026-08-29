@@ -2,7 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Fotografia } from "@/config/mostra";
-import { animazioniAttive, gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, useModoAnimazioni } from "@/lib/gsap";
 
 function tempo(secondi: number) {
   if (!Number.isFinite(secondi) || secondi < 0) return "0:00";
@@ -13,6 +13,7 @@ function tempo(secondi: number) {
 
 /** Lettore musicale della singola opera. Ancorato in basso, sempre a portata di pollice. */
 export default function Lettore({ opera }: { opera: Fotografia }) {
+  const modo = useModoAnimazioni();
   const audio = useRef<HTMLAudioElement>(null);
   const barra = useRef<HTMLDivElement>(null);
   const radice = useRef<HTMLDivElement>(null);
@@ -27,7 +28,12 @@ export default function Lettore({ opera }: { opera: Fotografia }) {
   /* Entrata del lettore dal basso */
   useGSAP(
     () => {
-      if (!animazioniAttive()) return;
+      if (modo === "spente") return;
+
+      if (modo === "ridotte") {
+        gsap.fromTo(radice.current, { opacity: 0 }, { opacity: 1, duration: 0.5, delay: 0.2 });
+        return;
+      }
 
       gsap.fromTo(
         radice.current,
@@ -35,13 +41,14 @@ export default function Lettore({ opera }: { opera: Fotografia }) {
         { yPercent: 0, duration: 1, ease: "expo.out", delay: 0.5 }
       );
     },
-    { scope: radice }
+    { dependencies: [modo], scope: radice }
   );
 
   /* Le barrette dell'equalizzatore vivono solo mentre suona */
   useGSAP(
     () => {
-      if (!animazioniAttive()) return;
+      /* L'equalizzatore e' movimento continuo: con "riduci movimento" resta fermo */
+      if (modo !== "piene") return;
 
       const barrette = gsap.utils.toArray<HTMLElement>(".eq-barra");
       if (!inRiproduzione) {
@@ -60,7 +67,7 @@ export default function Lettore({ opera }: { opera: Fotografia }) {
         });
       });
     },
-    { dependencies: [inRiproduzione], scope: radice }
+    { dependencies: [inRiproduzione, modo], scope: radice }
   );
 
   const alternaRiproduzione = useCallback(() => {
@@ -105,14 +112,6 @@ export default function Lettore({ opera }: { opera: Fotografia }) {
       el.removeEventListener("error", onErrore);
     };
   }, []);
-
-  /* Cambio opera: si azzera tutto */
-  useEffect(() => {
-    setInRiproduzione(false);
-    setPosizione(0);
-    setDurata(audio.current?.duration ?? 0);
-    setErrore(false);
-  }, [opera.id]);
 
   /* Trascinamento / tocco sulla barra per spostarsi nel brano */
   const cerca = useCallback(

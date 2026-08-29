@@ -1,26 +1,34 @@
 "use client";
 
 import { useRef } from "react";
-import { animazioniAttive, gsap, useGSAP } from "@/lib/gsap";
+import { gsap, useGSAP, useModoAnimazioni } from "@/lib/gsap";
 
 /**
  * Contenitore che fa entrare in scena i figli marcati `.rivela`,
  * uno dopo l'altro. Usato nelle pagine di testo.
  */
 export default function Rivela({ children }: { children: React.ReactNode }) {
+  const modo = useModoAnimazioni();
   const radice = useRef<HTMLDivElement>(null);
 
   useGSAP(
     () => {
-      if (!animazioniAttive()) return;
+      if (modo === "spente") return;
 
+      const ridotte = modo === "ridotte";
       gsap.fromTo(
         ".rivela",
-        { y: 30, opacity: 0 },
-        { y: 0, opacity: 1, duration: 1, stagger: 0.09, ease: "power3.out" }
+        { y: ridotte ? 0 : 30, opacity: 0 },
+        {
+          y: 0,
+          opacity: 1,
+          duration: ridotte ? 0.5 : 1,
+          stagger: ridotte ? 0.05 : 0.09,
+          ease: ridotte ? "power1.out" : "power3.out",
+        }
       );
     },
-    { scope: radice }
+    { dependencies: [modo], scope: radice }
   );
 
   return <div ref={radice}>{children}</div>;

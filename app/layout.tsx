@@ -43,7 +43,14 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="it" className={`${displayFont.variable} ${sansFont.variable}`}>
+    /* suppressHydrationWarning: lo script qui sotto scrive data-anima su <html>
+       prima che React si idrati, quindi server e client differiscono di
+       proposito. Vale solo per gli attributi di questo elemento. */
+    <html
+      lang="it"
+      className={`${displayFont.variable} ${sansFont.variable}`}
+      suppressHydrationWarning
+    >
       <head>
         {/* Decide PRIMA del primo disegno se questa visita puo' essere animata.
             Se la pagina viene aperta in secondo piano (scheda nascosta, anteprima
@@ -53,7 +60,7 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html:
               'try{var h=document.documentElement;' +
-              'if(document.visibilityState!=="hidden"&&!matchMedia("(prefers-reduced-motion: reduce)").matches){h.dataset.anima="si";' +
+              'if(document.visibilityState!=="hidden"){h.dataset.anima="si";' +
               // rete di sicurezza: se il codice delle animazioni non arriva
               // (rete lenta, script bloccato) si mostra tutto lo stesso.
               'setTimeout(function(){if(h.dataset.animaViva!=="si"){delete h.dataset.anima}},5000)}}catch(e){}',
