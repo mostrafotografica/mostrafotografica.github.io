@@ -109,9 +109,17 @@ Per mettere il materiale vero ti basta **sovrascrivere quei file tenendo lo
 stesso nome**: non devi toccare la configurazione.
 
 > **Se sostituisci una foto e continui a vedere quella vecchia**, non e' un
-> errore tuo: il server di sviluppo tiene in memoria le immagini gia'
-> ottimizzate, e il nome del file non e' cambiato. Riavvia `npm run dev`
-> (e ricarica la pagina saltando la cache) e comparira' quella nuova. In alternativa cambia i
+> errore tuo. Next tiene le immagini gia' ottimizzate in una cache su disco
+> la cui chiave e' il percorso del file: se il nome non cambia, continua a
+> servire la vecchia. Riavviare `npm run dev` **non basta**. Svuota la
+> cache e ricarica la pagina:
+>
+> ```bash
+> rm -rf .next/dev/cache/images
+> ```
+>
+> In sviluppo la cartella e' `.next/dev/cache/images`; per una build di
+> produzione e' `.next/cache/images`. Non serve fermare il server. In alternativa cambia i
 percorsi in `config/mostra.ts`. Quando hai finito puoi cancellare i
 `demo-*.mp3` rimasti inutilizzati.
 
