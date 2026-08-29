@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Fotografia } from "@/config/mostra";
 import { gsap, useGSAP, useModoAnimazioni } from "@/lib/gsap";
+import { percorso } from "@/lib/percorsi";
 
 function tempo(secondi: number) {
   if (!Number.isFinite(secondi) || secondi < 0) return "0:00";
@@ -132,7 +133,7 @@ export default function Lettore({ opera }: { opera: Fotografia }) {
       ref={radice}
       className="fixed inset-x-0 bottom-0 z-30 border-t border-linea bg-notte/80 backdrop-blur-xl"
     >
-      <audio ref={audio} src={opera.canzone} preload="metadata" />
+      <audio ref={audio} src={percorso(opera.canzone)} preload="metadata" />
 
       {/* barra di avanzamento / ricerca */}
       <div

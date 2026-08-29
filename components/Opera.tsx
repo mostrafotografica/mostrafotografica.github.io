@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { MOSTRA, NUMERO_FOTO, numeroFormattato, type Fotografia } from "@/config/mostra";
 import { gsap, useGSAP, useModoAnimazioni } from "@/lib/gsap";
+import { percorso } from "@/lib/percorsi";
 import Lettore from "@/components/Lettore";
 
 type Props = {
@@ -92,7 +93,7 @@ export default function Opera({ opera, precedente, successiva }: Props) {
       {/* la fotografia */}
       <div ref={cornice} className="grana relative mt-10 aspect-[3/4] w-full overflow-hidden bg-notte-2">
         <Image
-          src={opera.foto}
+          src={percorso(opera.foto)}
           alt={`${opera.titolo} — ${opera.luogo}`}
           fill
           priority

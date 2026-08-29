@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import { FOTOGRAFIE, getFotografia, getVicine } from "@/config/mostra";
 import Opera from "@/components/Opera";
+import { percorso } from "@/lib/percorsi";
 
 type Props = { params: Promise<{ id: string }> };
 
@@ -17,7 +18,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: opera.titolo,
     description: `${opera.titolo} — ${opera.luogo}. Musica: ${opera.titoloCanzone}.`,
-    openGraph: { images: [opera.foto] },
+    openGraph: { images: [percorso(opera.foto)] },
   };
 }
 

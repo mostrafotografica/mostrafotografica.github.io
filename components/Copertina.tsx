@@ -4,6 +4,7 @@ import { useRef } from "react";
 import Image from "next/image";
 import { FOTOGRAFIE, MOSTRA, NUMERO_FOTO } from "@/config/mostra";
 import { gsap, useGSAP, useModoAnimazioni } from "@/lib/gsap";
+import { percorso } from "@/lib/percorsi";
 
 /** Apertura della home: titolo che sale riga per riga sopra una foto che respira. */
 export default function Copertina() {
@@ -84,7 +85,7 @@ export default function Copertina() {
       {/* immagine di apertura */}
       <div ref={sfondo} className="grana absolute inset-0 -top-[10%] h-[120%]">
         <Image
-          src={FOTOGRAFIE[0]?.foto ?? ""}
+          src={percorso(FOTOGRAFIE[0]?.foto ?? "")}
           alt=""
           fill
           priority

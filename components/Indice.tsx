@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FOTOGRAFIE, numeroFormattato } from "@/config/mostra";
 import { gsap, useGSAP, useModoAnimazioni } from "@/lib/gsap";
+import { percorso } from "@/lib/percorsi";
 
 /** L'indice della mostra: lista numerata, una riga per fotografia. */
 export default function Indice() {
@@ -82,7 +83,7 @@ export default function Indice() {
 
                 <span className="grana relative block h-[6.5rem] w-[4.9rem] shrink-0 overflow-hidden bg-notte-2">
                   <Image
-                    src={f.foto}
+                    src={percorso(f.foto)}
                     alt={f.titolo}
                     fill
                     sizes="80px"

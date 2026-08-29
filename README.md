@@ -26,11 +26,17 @@ rifiuta (errore 403) le richieste ai propri file JavaScript provenienti da
 indirizzi non autorizzati: la pagina si carica ma resta immobile, senza
 animazioni. Riguarda solo lo sviluppo, il sito pubblicato non ne risente.
 
-Per la versione definitiva:
+Per generare il sito da pubblicare:
 
 ```bash
 npm run build
-npm start
+```
+
+Il risultato finisce in `out/`: sono file statici, apribili con qualsiasi
+server web. Per provarli in locale:
+
+```bash
+npx serve out
 ```
 
 ---
@@ -92,6 +98,63 @@ Blocco `MENU` in fondo a `config/mostra.ts`.
 
 **Per i QR code** punta a `https://tuodominio.it/1`, `/2`, e cosi' via
 (oppure alla home, se preferisci: il sito funziona in entrambi i modi).
+
+---
+
+## Pubblicazione su GitHub Pages
+
+Il sito viene generato come **export statico** (`output: "export"`), quindi
+non serve alcun server Node: sono file che GitHub Pages puo' servire cosi'
+come sono.
+
+### Da fare una sola volta
+
+1. Crea il repository su GitHub e collega questa cartella:
+
+   ```bash
+   git remote add origin https://github.com/TUO-UTENTE/NOME-REPO.git
+   git push -u origin main
+   ```
+
+2. Su GitHub vai in **Settings -> Pages -> Build and deployment** e imposta
+   **Source: GitHub Actions**.
+
+Da quel momento ogni `git push` su `main` ripubblica il sito. Puoi anche
+lanciare la pubblicazione a mano dalla scheda **Actions**, con il pulsante
+**Run workflow**.
+
+Il workflow e' in [`.github/workflows/deploy.yml`](.github/workflows/deploy.yml).
+
+### L'indirizzo del sito, e perche' non devi configurare nulla
+
+Su GitHub Pages il sito puo' finire in due posti diversi:
+
+| repository | indirizzo | prefisso |
+|---|---|---|
+| `utente/frammenti` | `utente.github.io/frammenti` | `/frammenti` |
+| `utente/utente.github.io` | `utente.github.io` | nessuno |
+| dominio personalizzato | `mostra.tuodominio.it` | nessuno |
+
+Quel prefisso deve finire dentro ogni collegamento e ogni immagine, altrimenti
+si vede una pagina bianca. **Lo calcola il workflow da solo** leggendo il nome
+del repository, e lo passa alla build: non devi scrivere niente a mano.
+
+**Per usare un dominio tuo**: crea un file `public/CNAME` con dentro solo il
+dominio (per esempio `mostra.tuodominio.it`), poi imposta il dominio anche in
+Settings -> Pages. Il workflow se ne accorge da solo e toglie il prefisso.
+
+### I QR code
+
+Punta i QR code a `https://indirizzo-del-sito/1`, `/2`, ... fino a `/20`.
+Funzionano sia con la barra finale sia senza: `/7` viene rediretto a `/7/`.
+
+### Un'avvertenza sul peso delle immagini
+
+Senza un server Node non c'e' nessuno che possa ridimensionare le fotografie
+al volo: vengono servite esattamente come sono nel repository. Esportale
+quindi gia' pronte, lato lungo entro **~1600px** e possibilmente sotto i
+**300 KB** l'una. Le anteprime in home si caricano man mano che scorri, non
+tutte insieme, ma su una rete lenta la differenza si sente.
 
 ---
 
