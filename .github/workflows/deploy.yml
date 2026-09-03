@@ -1,0 +1,90 @@
+# Pubblica il sito della mostra su GitHub Pages a ogni modifica di main.
+#
+# PRIMA VOLTA, da fare una sola volta a mano:
+#   su GitHub -> Settings -> Pages -> Build and deployment -> Source: "GitHub Actions"
+#
+# Da quel momento ogni push su main ripubblica il sito. Puoi anche lanciarlo
+# a mano dalla scheda "Actions" con il pulsante "Run workflow".
+
+name: Pubblica il sito
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Se arrivano piu' modifiche ravvicinate pubblica solo l'ultima,
+# senza interrompere una pubblicazione gia' in corso.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  costruisci:
+    name: Costruisci il sito
+    runs-on: ubuntu-latest
+    steps:
+      - name: Scarica il codice
+        uses: actions/checkout@v5
+
+      - name: Prepara Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installa le dipendenze
+        run: npm ci
+
+      - name: Calcola il percorso base
+        id: base
+        run: |
+          NOME_REPO="${GITHUB_REPOSITORY#*/}"
+          PROPRIETARIO="${GITHUB_REPOSITORY%%/*}"
+          # Con un dominio personalizzato (public/CNAME) o con il repo
+          # "utente.github.io" il sito sta nella radice: nessun prefisso.
+          if [ -f public/CNAME ] || [ "$NOME_REPO" = "${PROPRIETARIO}.github.io" ]; then
+            echo "percorso=" >> "$GITHUB_OUTPUT"
+            echo "Il sito sara' pubblicato nella radice del dominio."
+          else
+            echo "percorso=/$NOME_REPO" >> "$GITHUB_OUTPUT"
+            echo "Il sito sara' pubblicato sotto /$NOME_REPO"
+          fi
+
+      - name: Costruisci
+        env:
+          NEXT_PUBLIC_BASE_PATH: ${{ steps.base.outputs.percorso }}
+        run: npm run build
+
+      - name: Verifica che tutte le pagine siano state generate
+        run: |
+          test -f out/index.html || { echo "Manca la home"; exit 1; }
+          test -f out/404.html   || { echo "Manca la pagina 404"; exit 1; }
+          test -f out/1/index.html || { echo "Manca la pagina della prima opera"; exit 1; }
+          # cartelle numeriche = una per opera (404 e' una cartella a parte)
+          TROVATE=$(find out -mindepth 1 -maxdepth 1 -type d -name '[0-9]*' \
+                    -not -name 404 | wc -l | tr -d ' ')
+          echo "Pagine delle opere generate: $TROVATE"
+          test "$TROVATE" -gt 0 || { echo "Nessuna pagina di opera generata"; exit 1; }
+
+      - name: Prepara l'artefatto
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: out
+
+  pubblica:
+    name: Pubblica su Pages
+    needs: costruisci
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.pubblicazione.outputs.page_url }}
+    steps:
+      - name: Metti online
+        id: pubblicazione
+        uses: actions/deploy-pages@v4

@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/* =========================================================================
+ *  PALETTE & TIPOGRAFIA
+ *  Ispirata alla locandina: notte calda, terracotta, sabbia.
+ * ====================================================================== */
+@theme {
+  --color-notte: #0b0a09;
+  --color-notte-2: #131110;
+  --color-inchiostro: #f2ece4;
+  --color-terra: #c4794a;
+  --color-terra-chiara: #dda175;
+  --color-sabbia: #cbb49c;
+  --color-fumo: #8a7f74;
+  --color-linea: #2a2522;
+
+  --font-display: var(--font-display), "Times New Roman", serif;
+  --font-sans: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
+
+  --ease-morbida: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* =========================================================================
+ *  BASE
+ * ====================================================================== */
+html {
+  background-color: var(--color-notte);
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  background-color: var(--color-notte);
+  color: var(--color-inchiostro);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  overflow-x: hidden;
+}
+
+::selection {
+  background-color: var(--color-terra);
+  color: var(--color-notte);
+}
+
+/* Nasconde la scrollbar mantenendo lo scroll (esperienza da galleria) */
+body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+}
+body {
+  scrollbar-width: none;
+}
+
+/* Blocca lo scroll quando il menu a tutto schermo e' aperto */
+body[data-menu-aperto="true"] {
+  overflow: hidden;
+}
+
+a,
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 1px solid var(--color-terra);
+  outline-offset: 4px;
+}
+
+/* =========================================================================
+ *  UTILITY DI COMPOSIZIONE
+ * ====================================================================== */
+
+/* Titolo display: serif largo, crenatura stretta */
+.display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+}
+
+/* Etichette maiuscole spaziate (numeri opera, sezioni, meta) */
+.etichetta {
+  font-family: var(--font-sans);
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--color-fumo);
+}
+
+/* Contenitore mobile-first */
+.contenitore {
+  width: 100%;
+  max-width: 34rem;
+  margin-inline: auto;
+  padding-inline: 1.5rem;
+}
+
+/* Elementi che GSAP fara' entrare in scena.
+   Vengono nascosti SOLO se le animazioni sono davvero attive
+   (vedi lo script in <head> e animazioniAttive() in lib/gsap.ts):
+   in ogni altro caso restano visibili. Meglio nessuna animazione
+   che una pagina nera. */
+[data-anima="si"] .gsap-nascosto {
+  opacity: 0;
+}
+
+/* Maschera per il reveal riga per riga */
+.maschera {
+  overflow: hidden;
+  display: block;
+}
+
+/* Grana leggera sopra le immagini: da' materia alla stampa */
+.grana::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.16;
+  mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='140' height='140'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3'/%3E%3C/filter%3E%3Crect width='140' height='140' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+/* Linea sottile di separazione */
+.linea {
+  height: 1px;
+  background-color: var(--color-linea);
+}
+
+/* Con "riduci movimento" le comparse le gestisce GSAP con semplici
+   dissolvenze (vedi lib/gsap.ts): qui spegniamo solo transizioni e
+   animazioni CSS, che sono tutte decorative. */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
