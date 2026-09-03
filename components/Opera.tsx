@@ -113,7 +113,6 @@ export default function Opera({ opera, precedente, successiva }: Props) {
         <dl className="opera-blocco gsap-nascosto mt-12 border-t border-linea">
           {[
             { voce: "Luogo", valore: opera.luogo },
-            { voce: "Anno", valore: opera.anno },
             { voce: "Musica", valore: opera.titoloCanzone },
             { voce: "Interprete", valore: opera.artista },
           ]

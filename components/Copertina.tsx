@@ -85,7 +85,7 @@ export default function Copertina() {
       {/* immagine di apertura */}
       <div ref={sfondo} className="grana absolute inset-0 -top-[10%] h-[120%]">
         <Image
-          src={percorso(FOTOGRAFIE[0]?.foto ?? "")}
+          src={percorso("/copertina.webp")}
           alt=""
           fill
           priority

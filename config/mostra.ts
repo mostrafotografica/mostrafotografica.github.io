@@ -5,30 +5,31 @@
  *  Non serve toccare altro codice.
  *
  *  COME AGGIUNGERE / MODIFICARE UNA FOTO
- *  1. Metti il file immagine in      ->  /public/photos/    (es. 01.jpg)
- *  2. Metti il file audio in         ->  /public/audio/     (es. 01.mp3)
+ *  1. Metti il file immagine in      ->  /public/photos/   (es. 21.webp)
+ *  2. Metti il file audio in         ->  /public/audio/    (es. Titolo.m4a)
  *  3. Aggiungi o modifica una voce nell'array FOTOGRAFIE qui sotto:
  *
  *       {
- *         id: 1,                          // numero della foto in mostra (usato nell'URL: /1)
+ *         id: 21,                            // numero in mostra (usato nell'URL: /21)
  *         titolo: "Titolo della foto",
  *         luogo: "Luogo dello scatto",
- *         foto: "/photos/01.jpg",         // percorso file foto
- *         canzone: "/audio/01.mp3",       // percorso file canzone
+ *         foto: "/photos/21.webp",           // percorso file foto
+ *         canzone: "/audio/Titolo brano.m4a",// percorso file canzone
  *         titoloCanzone: "Titolo brano",
- *         artista: "Nome artista",        // opzionale
+ *         artista: "Nome artista",           // opzionale
  *       }
  *
  *  Il NUMERO DI FOTO e' semplicemente quante voci ci sono nell'array:
  *  aggiungi una voce = una foto in piu', togli una voce = una foto in meno.
  *  Gli `id` devono essere unici. L'ordine dell'array e' l'ordine in home.
  *
- *  NOTA: al momento foto e musica sono MOCKUP segnaposto, gia' dentro il
- *  progetto: fotografie di esempio in /public/photos (scaricate una volta
- *  sola, quindi il sito non dipende da internet) e brani demo generati in
- *  /public/audio. Per usare il materiale vero ti basta sovrascrivere quei
- *  file mantenendo gli stessi nomi (01.jpg, 02.jpg, ...) oppure cambiare
- *  qui sotto i percorsi.
+ *  NOMI DEI FILE: vanno copiati QUI ESATTAMENTE come sono sul disco.
+ *  Spazi, parentesi e accenti vanno bene (ci pensa il browser a codificarli),
+ *  ma attenzione a una trappola: i file esportati da Music/iTunes su Mac
+ *  possono avere gli accenti "scomposti" (e + accento) invece che precomposti.
+ *  Sul Mac funziona lo stesso, su GitHub Pages (Linux) darebbe 404. Se un
+ *  brano accentato non parte una volta pubblicato, e' quasi sempre questo:
+ *  rinomina il file riscrivendo l'accento a mano.
  * ========================================================================== */
 
 export type Fotografia = {
@@ -56,38 +57,39 @@ export type Fotografia = {
  *  DATI GENERALI DELLA MOSTRA
  * -------------------------------------------------------------------- */
 export const MOSTRA = {
-  titolo: "I miei frammenti di mondo",
+  titolo: "I MIEI FRAMMENTI DI MONDO",
   autrice: "Elisabetta Gonella",
   sottotitolo: "Mostra fotografica",
-  luogo: "Spazio Aperto — Via Roma 6, Osnago (LC)",
-  anno: "2026",
+  luogo: "Spazio Aperto - Via Roma 6, Osnago (LC)",
+  anno: "Settembre 2026",
 
   /** Testo introduttivo mostrato in home sotto il titolo */
   introduzione:
     "Venti fotografie, venti frammenti raccolti in giro per il mondo. " +
-    "Ogni immagine ha una sua musica: indossa gli auricolari, inquadra il codice sotto la foto e ascolta.",
+    "Ogni immagine ha una sua musica: indossa gli auricolari, guarda il numero sotto alla foto e ascolta.",
 
   /** Testo della pagina “La mostra” */
   testoMostra: [
     "Ogni viaggio lascia dei frammenti: una luce, un rumore, una strada percorsa una sola volta. " +
       "Questa mostra prova a rimetterli insieme.",
-    "Accanto a ogni fotografia trovi un codice QR. Inquadralo con il telefono e la fotografia " +
-      "che stai guardando si apre qui, insieme alla musica che le appartiene.",
+    "Sotto a ogni fotografia trovi un numero che riconduce alla canzone di riferimento. " +
+      "Clicca sul numero di riferimento qui per ascoltare la canzone collegata all'immagine",
     "Ti consigliamo di portare con te smartphone e auricolari: la mostra si guarda, ma soprattutto si ascolta.",
   ],
 
   /** Info pratiche mostrate nella pagina “La mostra” */
   informazioni: [
-    { voce: "Inaugurazione", valore: "11 settembre, ore 19.00 — 21.00" },
-    { voce: "Aperture", valore: "12—13 e 19—20 settembre" },
-    { voce: "Orari", valore: "10.00 — 12.00 / 16.00 — 19.00" },
+    { voce: "Inaugurazione", valore: "11 settembre, ore 19.00 - 21.00" },
+    { voce: "Aperture", valore: "12-13 e 19-20 settembre" },
+    { voce: "Orari", valore: "10.00 - 12.00 / 16.00 - 19.00" },
     { voce: "Ingresso", valore: "Libero" },
   ],
 
   /** Contatti mostrati nel menu e nella pagina “Contatti” */
   contatti: {
-    email: "info@spazioaperto.org",
+    email: "betty.go1959@gmail.com",
     sito: { etichetta: "spazioaperto.org", url: "https://www.spazioaperto.org" },
+    telefono: {etichetta:"360786107", url: "tel:+39360786107"},
     indirizzo: "Via Roma 6, Osnago (LC)",
     mappaUrl: "https://maps.google.com/?q=Via+Roma+6,+Osnago+LC",
     social: [
@@ -103,29 +105,211 @@ export const MOSTRA = {
 
 /* -----------------------------------------------------------------------
  *  ELENCO DELLE FOTOGRAFIE
- *  (attualmente 20 voci mockup — modifica liberamente)
+ *  Ogni voce collega una fotografia di /public/photos al suo brano in
+ *  /public/audio. I percorsi riportano il NOME ESATTO del file, spazi e
+ *  accenti compresi: se rinomini un file qui va aggiornato di conseguenza.
  * -------------------------------------------------------------------- */
 export const FOTOGRAFIE: Fotografia[] = [
-  { id: 1,  titolo: "Le tracce del giorno",     luogo: "Deserto di Al Marmoom, Emirati Arabi", foto: "/photos/01.jpg", canzone: "/audio/demo-01.mp3", titoloCanzone: "Dune al tramonto",      artista: "Brano dimostrativo", anno: "2024" },
-  { id: 2,  titolo: "Cuba, ore otto",           luogo: "L'Avana, Cuba",                        foto: "/photos/02.jpg", canzone: "/audio/demo-02.mp3", titoloCanzone: "Malecón",               artista: "Brano dimostrativo", anno: "2023" },
-  { id: 3,  titolo: "Le due mani",              luogo: "Monument Valley, Utah",                foto: "/photos/03.jpg", canzone: "/audio/demo-03.mp3", titoloCanzone: "Red Earth",             artista: "Brano dimostrativo", anno: "2023" },
-  { id: 4,  titolo: "Il turno di notte",        luogo: "Tokyo, Giappone",                      foto: "/photos/04.jpg", canzone: "/audio/demo-04.mp3", titoloCanzone: "Neon Quiet",            artista: "Brano dimostrativo", anno: "2022" },
-  { id: 5,  titolo: "Sale e vento",             luogo: "Salar de Uyuni, Bolivia",              foto: "/photos/05.jpg", canzone: "/audio/demo-05.mp3", titoloCanzone: "Specchio bianco",       artista: "Brano dimostrativo", anno: "2022" },
-  { id: 6,  titolo: "Preghiera del mattino",    luogo: "Bagan, Myanmar",                       foto: "/photos/06.jpg", canzone: "/audio/demo-01.mp3", titoloCanzone: "Campane lontane",       artista: "Brano dimostrativo", anno: "2019" },
-  { id: 7,  titolo: "La casa gialla",           luogo: "Chefchaouen, Marocco",                 foto: "/photos/07.jpg", canzone: "/audio/demo-02.mp3", titoloCanzone: "Medina",                artista: "Brano dimostrativo", anno: "2019" },
-  { id: 8,  titolo: "Undici gradi",             luogo: "Fiordo di Geiranger, Norvegia",        foto: "/photos/08.jpg", canzone: "/audio/demo-03.mp3", titoloCanzone: "Acqua ferma",           artista: "Brano dimostrativo", anno: "2021" },
-  { id: 9,  titolo: "Chi resta",                luogo: "Lisbona, Portogallo",                  foto: "/photos/09.jpg", canzone: "/audio/demo-04.mp3", titoloCanzone: "Saudade",               artista: "Brano dimostrativo", anno: "2024" },
-  { id: 10, titolo: "Traffico verticale",       luogo: "New York, Stati Uniti",                foto: "/photos/10.jpg", canzone: "/audio/demo-05.mp3", titoloCanzone: "Uptown",                artista: "Brano dimostrativo", anno: "2018" },
-  { id: 11, titolo: "Le mani di Amina",         luogo: "Zanzibar, Tanzania",                   foto: "/photos/11.jpg", canzone: "/audio/demo-01.mp3", titoloCanzone: "Kizimkazi",             artista: "Brano dimostrativo", anno: "2020" },
-  { id: 12, titolo: "Ultimo autobus",           luogo: "La Paz, Bolivia",                      foto: "/photos/12.jpg", canzone: "/audio/demo-02.mp3", titoloCanzone: "Altopiano",             artista: "Brano dimostrativo", anno: "2022" },
-  { id: 13, titolo: "Nebbia alle sette",        luogo: "Val d'Orcia, Italia",                  foto: "/photos/13.jpg", canzone: "/audio/demo-03.mp3", titoloCanzone: "Colline",               artista: "Brano dimostrativo", anno: "2025" },
-  { id: 14, titolo: "Il muro azzurro",          luogo: "Jodhpur, India",                       foto: "/photos/14.jpg", canzone: "/audio/demo-04.mp3", titoloCanzone: "Blue City",             artista: "Brano dimostrativo", anno: "2019" },
-  { id: 15, titolo: "Pioggia di aprile",        luogo: "Kyoto, Giappone",                      foto: "/photos/15.jpg", canzone: "/audio/demo-05.mp3", titoloCanzone: "Ame",                   artista: "Brano dimostrativo", anno: "2022" },
-  { id: 16, titolo: "Chi guarda il mare",       luogo: "Essaouira, Marocco",                   foto: "/photos/16.jpg", canzone: "/audio/demo-01.mp3", titoloCanzone: "Atlantico",             artista: "Brano dimostrativo", anno: "2019" },
-  { id: 17, titolo: "Quattro sedie",            luogo: "Buenos Aires, Argentina",              foto: "/photos/17.jpg", canzone: "/audio/demo-02.mp3", titoloCanzone: "Milonga",               artista: "Brano dimostrativo", anno: "2023" },
-  { id: 18, titolo: "Sotto zero",               luogo: "Islanda del Sud",                      foto: "/photos/18.jpg", canzone: "/audio/demo-03.mp3", titoloCanzone: "Glacier",               artista: "Brano dimostrativo", anno: "2021" },
-  { id: 19, titolo: "La fine della strada",     luogo: "Route 66, Arizona",                    foto: "/photos/19.jpg", canzone: "/audio/demo-04.mp3", titoloCanzone: "Mother Road",           artista: "Brano dimostrativo", anno: "2023" },
-  { id: 20, titolo: "Ritorno",                  luogo: "Osnago, Italia",                       foto: "/photos/20.jpg", canzone: "/audio/demo-05.mp3", titoloCanzone: "Casa",                  artista: "Brano dimostrativo", anno: "2026" },
+  {
+    id: 1,
+    titolo: "...POI ESCE IL SOLE",
+    luogo: "San Francisco",
+    foto: "/photos/1.webp",
+    canzone: "/audio/1-07 Morning Has Broken.m4a",
+    titoloCanzone: "Morning has broken",
+    artista: "Cat Stevens",
+    anno: "2024",
+  },
+  {
+    id: 2,
+    titolo: "IL FASCINO DEI PLATANI",
+    luogo: "Barcellona",
+    foto: "/photos/2.webp",
+    canzone: "/audio/2-01 Sorry Seems to Be the Hardest Word.m4a",
+    titoloCanzone: "Sorry seems to be the hardest word",
+    artista: "Elton John",
+    anno: "2023",
+  },
+  {
+    id: 3,
+    titolo: "RIFLESSIONI",
+    luogo: "Florida",
+    foto: "/photos/3.webp",
+    canzone: "/audio/02 Ti ho voluto bene veramente.m4a",
+    titoloCanzone: "Ti ho voluto bene veramente",
+    artista: "Marco Mengoni",
+    anno: "2023",
+  },
+  {
+    id: 4,
+    titolo: "SUA MAESTA",
+    luogo: "Cuba",
+    foto: "/photos/4.webp",
+    canzone: "/audio/07 Cosa Sarà.m4a",
+    titoloCanzone: "Cosa sarà",
+    artista: "Lucio Dalla",
+    anno: "2022",
+  },
+  {
+    id: 5,
+    titolo: "MEGLIO SOLI...",
+    luogo: "Toscana",
+    foto: "/photos/5.webp",
+    canzone: "/audio/01 The Sound of Silence.m4a",
+    titoloCanzone: "The sound of silence",
+    artista: "Simon & Garfunkel",
+    anno: "2022",
+  },
+  {
+    id: 6,
+    titolo: "C’ERA UNA VOLTA",
+    luogo: "Cuba",
+    foto: "/photos/6.webp",
+    canzone: "/audio/1-12 Earth Song.m4a",
+    titoloCanzone: "Earth song",
+    artista: "Michael Jackson",
+    anno: "2019",
+  },
+  {
+    id: 7,
+    titolo: "UN’AVVENTURA",
+    luogo: "Marocco",
+    foto: "/photos/7.webp",
+    canzone: "/audio/2-07 Buon viaggio (Share the Love) [Remastered].m4a",
+    titoloCanzone: "Buon viaggio",
+    artista: "Cesare Cremonini",
+    anno: "2019",
+  },
+  {
+    id: 8,
+    titolo: "INSHALLAH",
+    luogo: "Marocco",
+    foto: "/photos/8.webp",
+    canzone: "/audio/03 Mishaela.m4a",
+    titoloCanzone: "Mishaela",
+    artista: "Noa",
+    anno: "2021",
+  },
+  {
+    id: 9,
+    titolo: "ORO IN CAMPAGNA",
+    luogo: "Toscana",
+    foto: "/photos/9.webp",
+    canzone: "/audio/06 Pensieri e parole.m4a",
+    titoloCanzone: "Pensieri e parole",
+    artista: "Lucio Battisti",
+    anno: "2024",
+  },
+  {
+    id: 10,
+    titolo: "TRA LA TERRA E IL CIELO",
+    luogo: "Vietnam",
+    foto: "/photos/10.webp",
+    canzone: "/audio/06 Merry Christmas Mr. Lawrence (Version for Piano Trio).m4a",
+    titoloCanzone: "Merry Christmas Mr. Lawrence",
+    artista: "Ryūichi Sakamoto",
+    anno: "2018",
+  },
+  {
+    id: 11,
+    titolo: "LIBRI TESSUTI A MANO",
+    luogo: "Giordania",
+    foto: "/photos/11.webp",
+    canzone: "/audio/02 Desert Rose.m4a",
+    titoloCanzone: "Desert Rose",
+    artista: "Sting",
+    anno: "2020",
+  },
+  {
+    id: 12,
+    titolo: "ROSSO NAVAJO",
+    luogo: "Arizona",
+    foto: "/photos/12.webp",
+    canzone: "/audio/05 A Horse With No Name.m4a",
+    titoloCanzone: "Horse with no name",
+    artista: "America",
+    anno: "2022",
+  },
+  {
+    id: 13,
+    titolo: "DISEGNI DEL VENTO",
+    luogo: "Namibia",
+    foto: "/photos/13.webp",
+    canzone: "/audio/11 Fragile (My Songs Version).m4a",
+    titoloCanzone: "Fragile",
+    artista: "Sting",
+    anno: "2025",
+  },
+  {
+    id: 14,
+    titolo: "IL GIORNO CHE FINISCE",
+    luogo: "Namibia",
+    foto: "/photos/14.webp",
+    canzone: "/audio/01 Imagine.m4a",
+    titoloCanzone: "Imagine",
+    artista: "John Lennon",
+    anno: "2019",
+  },
+  {
+    id: 15,
+    titolo: "IL TE NEL DESERTO",
+    luogo: "Libia",
+    foto: "/photos/15.webp",
+    canzone: "/audio/01 I Don_t Know.m4a",
+    titoloCanzone: "I don’t know",
+    artista: "Noa",
+    anno: "2022",
+  },
+  {
+    id: 16,
+    titolo: "UN VIAGGIO INSIEME",
+    luogo: "Namibia",
+    foto: "/photos/16.webp",
+    canzone: "/audio/10 Father and Son.m4a",
+    titoloCanzone: "Father and son",
+    artista: "Cat Stevens",
+    anno: "2019",
+  },
+  {
+    id: 17,
+    titolo: "NO STRESS",
+    luogo: "Florida",
+    foto: "/photos/17.webp",
+    canzone: "/audio/01 Summer On A Solitary Beach (Remastered 2021).m4a",
+    titoloCanzone: "Summer on a solitary beach",
+    artista: "Franco Battiato",
+    anno: "2023",
+  },
+  {
+    id: 18,
+    titolo: "CONTRO CORRENTE",
+    luogo: "Nizza",
+    foto: "/photos/18.webp",
+    canzone: "/audio/02 C_è chi dice no.m4a",
+    titoloCanzone: "C’è chi dice no",
+    artista: "Vasco Rossi",
+    anno: "2021",
+  },
+  {
+    id: 19,
+    titolo: "CELESTE",
+    luogo: "Cuba",
+    foto: "/photos/19.webp",
+    canzone: "/audio/01 Chan Chan.m4a",
+    titoloCanzone: "Chan Chan",
+    artista: "Buena Vista Social Club",
+    anno: "2023",
+  },
+  {
+    id: 20,
+    titolo: "NON SOLO SPINE",
+    luogo: "Provenza",
+    foto: "/photos/20.webp",
+    canzone: "/audio/01 Dimanche Midi Pile.m4a",
+    titoloCanzone: "Dimanche midi pile",
+    artista: "Gisèle",
+    anno: "2026",
+  },
 ];
 
 /* -----------------------------------------------------------------------

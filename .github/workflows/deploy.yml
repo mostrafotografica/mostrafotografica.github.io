@@ -31,6 +31,11 @@ jobs:
     steps:
       - name: Scarica il codice
         uses: actions/checkout@v5
+        with:
+          # Le musiche stanno in Git LFS: senza questo la checkout scarica
+          # dei segnaposto di testo da poche centinaia di byte al posto dei
+          # brani, la build riesce lo stesso e il sito pubblica audio rotto.
+          lfs: true
 
       - name: Prepara Node
         uses: actions/setup-node@v5
@@ -60,6 +65,21 @@ jobs:
         env:
           NEXT_PUBLIC_BASE_PATH: ${{ steps.base.outputs.percorso }}
         run: npm run build
+
+      - name: Verifica che le musiche siano vere e non segnaposto LFS
+        run: |
+          # Se la checkout non scarica LFS, al posto dei brani restano file
+          # di testo che iniziano con "version https://git-lfs...". La build
+          # riuscirebbe comunque e il sito pubblicherebbe audio muto.
+          SEGNAPOSTO=$(grep -rl '^version https://git-lfs' out/audio 2>/dev/null | wc -l | tr -d ' ')
+          if [ "$SEGNAPOSTO" != "0" ]; then
+            echo "ERRORE: $SEGNAPOSTO brani sono segnaposto LFS, non audio vero."
+            echo "Controlla che 'lfs: true' sia presente nella checkout."
+            exit 1
+          fi
+          BRANI=$(find out/audio -name '*.m4a' | wc -l | tr -d ' ')
+          echo "Brani pubblicati: $BRANI"
+          test "$BRANI" -gt 0 || { echo "Nessun brano in out/audio"; exit 1; }
 
       - name: Verifica che tutte le pagine siano state generate
         run: |

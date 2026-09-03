@@ -40,19 +40,20 @@ export default function Contatti() {
               </a>
             </div>
 
+
             <div className="rivela gsap-nascosto">
-              <p className="etichetta mb-2">Sito</p>
+              <p className="etichetta mb-2">Telefono</p>
               <a
-                href={c.sito.url}
+                href={c.telefono.url}
                 target="_blank"
                 rel="noreferrer noopener"
                 className="font-display text-2xl"
               >
-                {c.sito.etichetta}
+                {c.telefono.etichetta}
               </a>
             </div>
 
-            <div className="rivela gsap-nascosto">
+            {/* <div className="rivela gsap-nascosto">
               <p className="etichetta mb-4">Social</p>
               <ul className="border-t border-linea">
                 {c.social.map((s) => (
@@ -71,7 +72,7 @@ export default function Contatti() {
                   </li>
                 ))}
               </ul>
-            </div>
+            </div> */}
           </div>
         </div>
       </Rivela>
