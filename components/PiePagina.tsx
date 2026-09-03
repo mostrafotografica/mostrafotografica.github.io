@@ -19,14 +19,14 @@ export default function PiePagina() {
           <Link href="/contatti" className="etichetta text-sabbia transition-colors hover:text-terra">
             Contatti
           </Link>
-          <a
+          {/* <a
             href={MOSTRA.contatti.sito.url}
             target="_blank"
             rel="noreferrer noopener"
             className="etichetta text-sabbia transition-colors hover:text-terra"
           >
             {MOSTRA.contatti.sito.etichetta}
-          </a>
+          </a> */}
         </div>
 
         <p className="etichetta mt-10 leading-relaxed text-fumo/70">

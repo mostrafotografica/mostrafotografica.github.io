@@ -6,6 +6,34 @@ inquadrandolo si apre la pagina di quell'opera con foto, luogo e musica.
 
 ---
 
+## Prima di tutto: le musiche stanno in Git LFS
+
+I 20 brani non sono file normali dentro al repository: sono gestiti con
+**Git LFS**, che al loro posto salva in git dei segnaposto da poche
+centinaia di byte e tiene i file veri su un archivio a parte.
+
+Vuol dire che se cloni il progetto **senza** Git LFS installato, in
+`public/audio/` trovi 20 file di testo che iniziano con
+`version https://git-lfs...` invece della musica, e il sito parte
+regolarmente ma non suona. Per evitarlo, una volta sola sul tuo computer:
+
+```bash
+brew install git-lfs && git lfs install
+```
+
+Se hai gia' clonato prima di installarlo, recupera i brani con:
+
+```bash
+git lfs pull
+```
+
+> **Nota sui limiti:** il piano gratuito di GitHub include 1 GB al mese di
+> traffico LFS. Ogni pubblicazione del sito ne consuma circa 75 MB, quindi
+> dopo una decina di pubblicazioni nello stesso mese le build cominciano a
+> fallire finche' il mese non si azzera. Se dovesse succedere, i rimedi
+> sono comprare traffico aggiuntivo su GitHub, oppure togliere l'audio da
+> LFS e alleggerirlo (per esempio pubblicando estratti piu' corti).
+
 ## Come si avvia
 
 ```bash
