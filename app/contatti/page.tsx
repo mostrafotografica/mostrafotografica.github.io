@@ -41,17 +41,21 @@ export default function Contatti() {
             </div>
 
 
-            <div className="rivela gsap-nascosto">
-              <p className="etichetta mb-2">Telefono</p>
-              <a
-                href={c.telefono.url}
-                target="_blank"
-                rel="noreferrer noopener"
-                className="font-display text-2xl"
-              >
-                {c.telefono.etichetta}
-              </a>
-            </div>
+            {/* Il telefono compare solo se in config/mostra.ts c'e' un numero:
+                al momento e' `undefined`, quindi questo blocco non esiste. */}
+            {c.telefono ? (
+              <div className="rivela gsap-nascosto">
+                <p className="etichetta mb-2">Telefono</p>
+                <a
+                  href={c.telefono.url}
+                  target="_blank"
+                  rel="noreferrer noopener"
+                  className="font-display text-2xl"
+                >
+                  {c.telefono.etichetta}
+                </a>
+              </div>
+            ) : null}
 
             {/* <div className="rivela gsap-nascosto">
               <p className="etichetta mb-4">Social</p>

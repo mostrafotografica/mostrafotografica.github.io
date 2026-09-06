@@ -32,6 +32,9 @@
  *  rinomina il file riscrivendo l'accento a mano.
  * ========================================================================== */
 
+/** Un contatto cliccabile: cosa si legge sullo schermo e dove porta il tocco */
+export type VoceContatto = { etichetta: string; url: string };
+
 export type Fotografia = {
   /** Numero della foto in mostra. Compare nell'URL: /1, /2, /3 ... */
   id: number;
@@ -89,7 +92,12 @@ export const MOSTRA = {
   contatti: {
     email: "betty.go1959@gmail.com",
     sito: { etichetta: "spazioaperto.org", url: "https://www.spazioaperto.org" },
-    telefono: {etichetta:"360786107", url: "tel:+39360786107"},
+    /* TELEFONO - al momento NON pubblicato: il numero non compare da nessuna
+       parte del sito, nemmeno nel codice che il browser scarica.
+       Per rimetterlo, sostituisci `undefined` con
+         { etichetta: "360786107", url: "tel:+39360786107" }
+       e il blocco riappare da solo nella pagina Contatti. */
+    telefono: undefined as VoceContatto | undefined,
     indirizzo: "Via Roma 6, Osnago (LC)",
     mappaUrl: "https://maps.google.com/?q=Via+Roma+6,+Osnago+LC",
     social: [
