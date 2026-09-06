@@ -112,6 +112,51 @@ export const MOSTRA = {
 } as const;
 
 /* -----------------------------------------------------------------------
+ *  ACCESSO AL SITO (password)
+ *  -----------------------------------------------------------------------
+ *  Il sito e' fatto di soli file statici: non c'e' nessun server che possa
+ *  controllare davvero una password, quindi chi va a curiosare nel codice
+ *  della pagina la trova. NON e' una misura di sicurezza: serve a tenere
+ *  fuori chi capita per caso. In mostra la password sta scritta accanto ai
+ *  QR code, chi non c'e' stato non la conosce.
+ *
+ *  DUE MODI PER ENTRARE
+ *  1. Scrivendola nel riquadro che compare aprendo il sito.
+ *  2. Mettendola nell'indirizzo, come parametro:
+ *
+ *        https://indirizzo-del-sito/?p=frammenti
+ *        https://indirizzo-del-sito/7/?p=frammenti     <- vale anche sulle foto
+ *
+ *     E' il modo comodo per i QR code: chi inquadra entra senza digitare
+ *     niente. Appena il sito si apre la password sparisce dalla barra
+ *     dell'indirizzo, cosi' non resta in vista a schermo.
+ *
+ *  Una volta entrati il permesso resta memorizzato nel telefono: le altre
+ *  pagine e le visite dei giorni dopo si aprono senza chiedere piu' nulla.
+ *  Se cambi la password qui sotto, i permessi gia' dati decadono e tutti
+ *  se la ritrovano richiesta: e' il modo per "chiudere" il sito a mostra
+ *  finita.
+ *
+ *  PER TOGLIERE DEL TUTTO IL LUCCHETTO:  password: ""
+ * -------------------------------------------------------------------- */
+export const ACCESSO = {
+  /** Password della mostra. Maiuscole/minuscole e spazi ai lati non contano. */
+  password: "frammenti",
+
+  /** Nome del parametro nell'indirizzo: con "p" il link e' ...?p=frammenti */
+  parametro: "p",
+
+  /* --- testi del riquadro di accesso --- */
+  soprattitolo: "Accesso riservato",
+  invito:
+    "Questo sito accompagna la mostra. La password è scritta accanto ai " +
+    "QR code in sala: scrivila qui sotto, te la chiediamo una volta sola.",
+  etichettaCampo: "Password",
+  pulsante: "Entra",
+  errore: "Password non corretta. Controlla e riprova.",
+} as const;
+
+/* -----------------------------------------------------------------------
  *  ELENCO DELLE FOTOGRAFIE
  *  Ogni voce collega una fotografia di /public/photos al suo brano in
  *  /public/audio. I percorsi riportano il NOME ESATTO del file, spazi e

@@ -69,6 +69,23 @@ button {
 }
 
 /* =========================================================================
+ *  IL CANCELLO (password)
+ *  Lo script in cima a app/layout.tsx decide PRIMA del primo disegno se
+ *  questa visita puo' entrare e scrive data-accesso su <html>. Queste due
+ *  righe fanno il resto senza lampeggiamenti: chi ha gia' il permesso non
+ *  vede mai il riquadro, chi non ce l'ha non vede mai il sito.
+ *  Se lo script non parte l'attributo manca e, per prudenza, vince il
+ *  riquadro: meglio una password chiesta di troppo che il sito spalancato.
+ * ====================================================================== */
+html:not([data-accesso="si"]) .sito {
+  display: none;
+}
+
+html[data-accesso="si"] .cancello {
+  display: none;
+}
+
+/* =========================================================================
  *  UTILITY DI COMPOSIZIONE
  * ====================================================================== */
 

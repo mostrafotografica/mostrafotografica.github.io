@@ -115,6 +115,69 @@ Blocco `MENU` in fondo a `config/mostra.ts`.
 
 ---
 
+## La password del sito
+
+Il sito chiede una password all'apertura. La imposti in **un solo punto**:
+il blocco `ACCESSO` di [`config/mostra.ts`](config/mostra.ts).
+
+```ts
+export const ACCESSO = {
+  password: "frammenti",   // <- cambiala
+  parametro: "p",          // nome del parametro nell'indirizzo
+  ...
+};
+```
+
+**Cambiala prima di pubblicare**: quella scritta ora e' solo un segnaposto.
+
+### Non e' una vera protezione, ed e' voluto
+
+Il sito e' fatto di soli file statici: non c'e' nessun server che possa
+verificare qualcosa, quindi la password viaggia dentro alla pagina e chi va
+a curiosare nel codice la trova. Non serve a difendere i contenuti: serve a
+tenere fuori chi capita per caso, perche' la password sta scritta in sala e
+chi non c'e' stato non la conosce.
+
+Le fotografie e i brani, di conseguenza, restano scaricabili da chi sa dove
+cercare. Se un giorno servisse una protezione vera, l'unica strada e'
+spostare il sito dietro a un server che la controlli (per esempio Netlify o
+Vercel con una password di sito, oppure un `.htaccess` su un hosting
+classico): GitHub Pages, da solo, non lo permette.
+
+### I due modi di entrare
+
+**Scrivendola**, nel riquadro che compare aprendo il sito. Maiuscole,
+minuscole e spazi ai lati non contano: `Frammenti` e ` frammenti ` vanno
+bene uguale, il che con le tastiere dei telefoni evita parecchi errori.
+
+**Dall'indirizzo**, aggiungendo il parametro:
+
+```
+https://indirizzo-del-sito/?p=frammenti
+https://indirizzo-del-sito/7/?p=frammenti      <- vale anche sulle foto
+```
+
+Cosi' chi apre il link entra senza digitare niente. E' il modo comodo per i
+**QR code**: se li stampi con il parametro dentro, chi inquadra la foto in
+mostra si ritrova direttamente sulla pagina dell'opera. Appena il sito si
+apre la password sparisce dalla barra dell'indirizzo, quindi non resta in
+vista sullo schermo di chi guarda.
+
+### Una volta sola
+
+Entrato, il telefono se lo ricorda: le altre pagine e le visite dei giorni
+successivi si aprono senza chiedere nulla. Il ricordo e' legato alla
+password: **se la cambi, decade per tutti** e la password torna a essere
+richiesta. E' il modo per chiudere il sito a mostra finita.
+
+Per **togliere del tutto il lucchetto**, lascia la password vuota:
+
+```ts
+password: "",
+```
+
+---
+
 ## Gli indirizzi delle pagine
 
 | Indirizzo     | Cosa mostra                                  |
@@ -175,6 +238,10 @@ Settings -> Pages. Il workflow se ne accorge da solo e toglie il prefisso.
 
 Punta i QR code a `https://indirizzo-del-sito/1`, `/2`, ... fino a `/20`.
 Funzionano sia con la barra finale sia senza: `/7` viene rediretto a `/7/`.
+
+Se vuoi che chi inquadra **non debba digitare la password**, mettila nel
+link: `https://indirizzo-del-sito/7/?p=frammenti` (vedi
+[La password del sito](#la-password-del-sito)).
 
 ### Un'avvertenza sul peso delle immagini
 
@@ -248,6 +315,32 @@ Sono previste tre modalita' (`lib/gsap.ts`):
 
 Se aggiungi animazioni tue, segui la stessa regola:
 `if (modo === "spente") return;` e nessun `opacity: 0` fisso nel CSS.
+
+### Come fa il cancello a non lampeggiare
+
+Il riquadro della password usa lo stesso trucco delle animazioni. Il sito e'
+un export statico: l'HTML viene scritto in fase di build e non puo' sapere
+chi lo aprira', quindi contiene **tutt'e due le cose**, riquadro e sito.
+
+A scegliere e' uno script in cima a `app/layout.tsx` (il codice sta in
+[`lib/accesso.ts`](lib/accesso.ts)) che gira **prima del primo disegno**:
+guarda il parametro nell'indirizzo e la memoria del telefono, e scrive
+l'esito su `<html data-accesso="si|no">`. Due righe di CSS in `globals.css`
+fanno il resto, prima che si veda qualsiasi cosa:
+
+```css
+html:not([data-accesso="si"]) .sito { display: none; }
+html[data-accesso="si"] .cancello  { display: none; }
+```
+
+Subito dopo l'idratazione, `components/Accesso.tsx` legge quell'attributo e
+**smonta** il pezzo di troppo. Smontare (invece di limitarsi a nascondere)
+serve a una cosa precisa: quando la password viene azzeccata il sito nasce
+in quel momento, e le animazioni di apertura partono da capo come se fosse
+la prima visita.
+
+Se lo script non parte, l'attributo manca e per prudenza vince il riquadro:
+meglio una password chiesta di troppo che il sito spalancato.
 
 ### Attenzione a Tailwind 4 + GSAP
 
