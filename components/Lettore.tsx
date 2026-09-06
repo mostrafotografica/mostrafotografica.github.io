@@ -12,7 +12,20 @@ function tempo(secondi: number) {
   return `${m}:${String(s).padStart(2, "0")}`;
 }
 
-/** Lettore musicale della singola opera. Ancorato in basso, sempre a portata di pollice. */
+/**
+ * Lettore musicale della singola opera. Ancorato in basso, sempre a portata
+ * di pollice.
+ *
+ * DUE STATI, DI PROPOSITO
+ * Finche' nessuno ha ancora premuto play il lettore e' in "invito": fondo
+ * scaldato di terracotta, filo superiore acceso, tasto pieno con un alone che
+ * pulsa, scritta grande "Ascolta la musica". Serve a farsi trovare: in mostra
+ * si e' visto che l'occhio va tutto alla fotografia e la barra in fondo, se
+ * discreta, non viene proprio notata.
+ * Dopo il primo play l'invito non serve piu' e il lettore si calma, tornando
+ * alla veste scura del resto del sito. Le misure restano identiche, cosi' il
+ * passaggio non fa saltare niente sullo schermo.
+ */
 export default function Lettore({ opera }: { opera: Fotografia }) {
   const modo = useModoAnimazioni();
   const audio = useRef<HTMLAudioElement>(null);
@@ -23,8 +36,11 @@ export default function Lettore({ opera }: { opera: Fotografia }) {
   const [posizione, setPosizione] = useState(0);
   const [durata, setDurata] = useState(0);
   const [errore, setErrore] = useState(false);
+  /* Il brano e' gia' stato avviato almeno una volta su questa pagina? */
+  const [usato, setUsato] = useState(false);
 
   const avanzamento = durata > 0 ? (posizione / durata) * 100 : 0;
+  const invito = !usato && !errore;
 
   /* Entrata del lettore dal basso */
   useGSAP(
@@ -43,6 +59,32 @@ export default function Lettore({ opera }: { opera: Fotografia }) {
       );
     },
     { dependencies: [modo], scope: radice }
+  );
+
+  /* L'alone che pulsa attorno al tasto, finche' nessuno lo ha ancora premuto.
+     E' movimento continuo: con "riduci movimento" resta un cerchio fermo,
+     che comunque stacca il tasto dal resto. */
+  useGSAP(
+    () => {
+      if (!invito || modo !== "piene") return;
+
+      gsap.fromTo(
+        ".lettore-alone",
+        { scale: 1, opacity: 0.6 },
+        {
+          scale: 2.1,
+          opacity: 0,
+          duration: 1.7,
+          ease: "power2.out",
+          repeat: -1,
+          repeatDelay: 0.7,
+          /* Parte dopo l'entrata del lettore e dopo che la foto si e'
+             composta: prima sarebbe solo un'altra cosa che si muove. */
+          delay: 1.8,
+        }
+      );
+    },
+    { dependencies: [invito, modo], scope: radice }
   );
 
   /* Le barrette dell'equalizzatore vivono solo mentre suona */
@@ -76,7 +118,10 @@ export default function Lettore({ opera }: { opera: Fotografia }) {
     if (!el || errore) return;
     if (el.paused) {
       el.play()
-        .then(() => setInRiproduzione(true))
+        .then(() => {
+          setInRiproduzione(true);
+          setUsato(true);
+        })
         .catch(() => setErrore(true));
     } else {
       el.pause();
@@ -129,92 +174,142 @@ export default function Lettore({ opera }: { opera: Fotografia }) {
   );
 
   return (
-    <div
-      ref={radice}
-      className="fixed inset-x-0 bottom-0 z-30 border-t border-linea bg-notte/80 backdrop-blur-xl"
-    >
-      <audio ref={audio} src={percorso(opera.canzone)} preload="metadata" />
-
-      {/* barra di avanzamento / ricerca */}
+    <div ref={radice} className="fixed inset-x-0 bottom-0 z-30">
       <div
-        ref={barra}
-        role="slider"
-        tabIndex={0}
-        aria-label="Avanzamento del brano"
-        aria-valuemin={0}
-        aria-valuemax={Math.round(durata) || 0}
-        aria-valuenow={Math.round(posizione)}
-        onPointerDown={(e) => {
-          (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
-          cerca(e.clientX);
-        }}
-        onPointerMove={(e) => {
-          if (e.buttons === 1) cerca(e.clientX);
-        }}
-        onKeyDown={(e) => {
-          const el = audio.current;
-          if (!el) return;
-          if (e.key === "ArrowRight") el.currentTime = Math.min(el.duration, el.currentTime + 5);
-          if (e.key === "ArrowLeft") el.currentTime = Math.max(0, el.currentTime - 5);
-        }}
-        className="group relative h-6 cursor-pointer touch-none"
+        className={`relative border-t bg-notte-2 transition-colors duration-700 ${
+          invito
+            ? "border-terra shadow-[0_-26px_60px_-10px_rgba(0,0,0,0.92)]"
+            : "border-linea shadow-[0_-20px_50px_-16px_rgba(0,0,0,0.85)]"
+        }`}
       >
-        <span className="absolute inset-x-0 top-3 h-px bg-linea" />
-        <span
-          className="absolute left-0 top-3 h-px bg-terra transition-[width] duration-100 ease-linear"
-          style={{ width: `${avanzamento}%` }}
-        />
-        <span
-          className="absolute top-3 -ml-[3px] h-[7px] w-[7px] -translate-y-1/2 rounded-full bg-terra-chiara transition-opacity"
-          style={{ left: `${avanzamento}%`, opacity: durata ? 1 : 0 }}
-        />
-      </div>
+        {/* Velo caldo: solo finche' il lettore deve farsi notare */}
+        {invito ? (
+          <span
+            className="pointer-events-none absolute inset-0 bg-terra/[0.07]"
+            aria-hidden
+          />
+        ) : null}
 
-      <div className="contenitore flex items-center gap-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-1">
+        <audio ref={audio} src={percorso(opera.canzone)} preload="metadata" />
+
+        {/* barra di avanzamento / ricerca */}
+        <div
+          ref={barra}
+          role="slider"
+          tabIndex={0}
+          aria-label="Avanzamento del brano"
+          aria-valuemin={0}
+          aria-valuemax={Math.round(durata) || 0}
+          aria-valuenow={Math.round(posizione)}
+          onPointerDown={(e) => {
+            (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+            cerca(e.clientX);
+          }}
+          onPointerMove={(e) => {
+            if (e.buttons === 1) cerca(e.clientX);
+          }}
+          onKeyDown={(e) => {
+            const el = audio.current;
+            if (!el) return;
+            if (e.key === "ArrowRight") el.currentTime = Math.min(el.duration, el.currentTime + 5);
+            if (e.key === "ArrowLeft") el.currentTime = Math.max(0, el.currentTime - 5);
+          }}
+          className="group relative h-7 cursor-pointer touch-none"
+        >
+          <span className="absolute inset-x-0 top-3.5 h-[2px] bg-linea" />
+          <span
+            className="absolute left-0 top-3.5 h-[2px] bg-terra transition-[width] duration-100 ease-linear"
+            style={{ width: `${avanzamento}%` }}
+          />
+          <span
+            className="absolute top-3.5 -ml-[5px] h-[10px] w-[10px] -translate-y-1/4 rounded-full bg-terra-chiara transition-opacity"
+            style={{ left: `${avanzamento}%`, opacity: durata ? 1 : 0 }}
+          />
+        </div>
+
+        {/* Tutta la riga e' il tasto: un dito impreciso fa partire la musica
+            lo stesso, senza dover centrare il cerchietto. */}
         <button
           type="button"
           onClick={alternaRiproduzione}
           disabled={errore}
-          aria-label={inRiproduzione ? "Metti in pausa" : "Ascolta il brano"}
-          className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full border border-terra/60 text-terra-chiara transition-colors duration-500 hover:bg-terra hover:text-notte disabled:opacity-30"
+          aria-label={
+            errore
+              ? "Traccia non disponibile"
+              : inRiproduzione
+                ? `Metti in pausa ${opera.titoloCanzone}`
+                : `Ascolta ${opera.titoloCanzone}`
+          }
+          className="contenitore relative flex items-center gap-4 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2 text-left disabled:opacity-40"
         >
-          {inRiproduzione ? (
-            <svg width="12" height="14" viewBox="0 0 12 14" fill="currentColor" aria-hidden>
-              <rect x="0" y="0" width="4" height="14" />
-              <rect x="8" y="0" width="4" height="14" />
-            </svg>
-          ) : (
-            <svg width="13" height="15" viewBox="0 0 13 15" fill="currentColor" aria-hidden>
-              <path d="M0 0l13 7.5L0 15z" />
-            </svg>
-          )}
-        </button>
-
-        <div className="min-w-0 flex-1">
-          <p className="etichetta mb-1 text-terra">
-            {errore ? "Traccia non disponibile" : "Ascolta"}
-          </p>
-          <p className="truncate font-display text-xl leading-tight">
-            {opera.titoloCanzone}
-            {opera.artista ? (
-              <span className="text-fumo"> — {opera.artista}</span>
+          <span className="relative flex h-14 w-14 shrink-0 items-center justify-center">
+            {/* alone: pulsa finche' il brano non e' mai partito */}
+            {invito ? (
+              <span
+                className="lettore-alone pointer-events-none absolute inset-0 rounded-full border border-terra/70"
+                aria-hidden
+              />
             ) : null}
-          </p>
-        </div>
 
-        <div className="hidden shrink-0 items-end gap-[3px] pb-1 min-[380px]:flex" aria-hidden>
-          {[0, 1, 2, 3].map((i) => (
             <span
-              key={i}
-              className="eq-barra block h-5 w-[2px] origin-bottom scale-y-[0.22] bg-sabbia/70"
-            />
-          ))}
-        </div>
+              className={`flex h-14 w-14 items-center justify-center rounded-full border transition-colors duration-500 ${
+                invito
+                  ? "border-terra bg-terra text-notte"
+                  : "border-terra/60 text-terra-chiara"
+              }`}
+            >
+              {inRiproduzione ? (
+                <svg width="14" height="17" viewBox="0 0 14 17" fill="currentColor" aria-hidden>
+                  <rect x="0" y="0" width="5" height="17" />
+                  <rect x="9" y="0" width="5" height="17" />
+                </svg>
+              ) : (
+                <svg width="16" height="18" viewBox="0 0 16 18" fill="currentColor" aria-hidden>
+                  <path d="M1 0l15 9L1 18z" />
+                </svg>
+              )}
+            </span>
+          </span>
 
-        <span className="etichetta shrink-0 tracking-[0.12em] tabular-nums">
-          {tempo(posizione)}
-          <span className="text-fumo/60"> / {tempo(durata)}</span>
-        </span>
+          <span className="min-w-0 flex-1">
+            <span
+              className={`mb-1 block font-sans font-medium uppercase leading-none transition-colors duration-500 ${
+                invito
+                  ? "text-[0.78rem] tracking-[0.16em] text-terra-chiara"
+                  : "text-[0.6875rem] tracking-[0.22em] text-fumo"
+              }`}
+            >
+              {errore
+                ? "Traccia non disponibile"
+                : invito
+                  ? "Ascolta la musica"
+                  : inRiproduzione
+                    ? "In ascolto"
+                    : "In pausa"}
+            </span>
+            <span className="block truncate font-display text-xl leading-tight">
+              {opera.titoloCanzone}
+              {opera.artista ? <span className="text-fumo"> — {opera.artista}</span> : null}
+            </span>
+          </span>
+
+          <span
+            className="hidden shrink-0 items-end gap-[3px] pb-1 min-[420px]:flex"
+            aria-hidden
+          >
+            {[0, 1, 2, 3].map((i) => (
+              <span
+                key={i}
+                className="eq-barra block h-5 w-[2px] origin-bottom scale-y-[0.22] bg-sabbia/70"
+              />
+            ))}
+          </span>
+
+          <span className="shrink-0 font-sans text-[0.68rem] font-medium tracking-[0.1em] tabular-nums text-fumo">
+            {tempo(posizione)}
+            <span className="text-fumo/60"> / {tempo(durata)}</span>
+          </span>
+        </button>
       </div>
     </div>
   );

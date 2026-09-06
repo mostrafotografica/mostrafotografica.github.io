@@ -71,7 +71,7 @@ export default function Opera({ opera, precedente, successiva }: Props) {
   );
 
   return (
-    <article ref={radice} className="pb-40 pt-24">
+    <article ref={radice} className="pb-48 pt-24">
       <div className="contenitore">
         <p className="opera-numero gsap-nascosto etichetta mb-6 flex items-center gap-3">
           <span className="text-terra">{numeroFormattato(opera.id)}</span>
@@ -87,6 +87,28 @@ export default function Opera({ opera, precedente, successiva }: Props) {
 
         <p className="opera-dettaglio gsap-nascosto mt-4 font-display text-xl italic text-terra-chiara">
           {opera.luogo}
+        </p>
+
+        {/* Chi guarda si perde nella fotografia e il lettore in fondo allo
+            schermo passa inosservato: qui, dove l'occhio arriva per primo,
+            gli diciamo che c'e' una musica e dove trovarla. */}
+        <p className="opera-dettaglio gsap-nascosto mt-6 flex items-start gap-3 border border-terra/35 bg-terra/[0.07] px-4 py-3 text-[0.9rem] leading-snug text-terra-chiara">
+          <svg
+            width="11"
+            height="13"
+            viewBox="0 0 11 13"
+            fill="currentColor"
+            className="mt-[0.28em] shrink-0"
+            aria-hidden
+          >
+            <path d="M0 0l11 6.5L0 13z" />
+          </svg>
+          {/* Il testo sta tutto in uno span: dentro un contenitore flex ogni
+              pezzo sciolto diventerebbe una colonna a se'. */}
+          <span>
+            Questa foto ha una sua musica: premi{" "}
+            <b className="font-semibold">Ascolta</b> in fondo allo schermo.
+          </span>
         </p>
       </div>
 

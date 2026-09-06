@@ -1,8 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Instrument_Serif, Inter } from "next/font/google";
 import { MOSTRA } from "@/config/mostra";
+import Accesso from "@/components/Accesso";
 import Header from "@/components/Header";
 import ScrollMorbido from "@/components/ScrollMorbido";
+import { scriptAccesso } from "@/lib/accesso";
 import "./globals.css";
 
 const displayFont = Instrument_Serif({
@@ -52,6 +54,13 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <head>
+        {/* Decide PRIMA del primo disegno se questa visita puo' entrare, e
+            scrive l'esito su <html data-accesso>. Due righe di CSS in
+            globals.css fanno il resto: chi ha gia' il permesso non vede mai
+            il riquadro della password, chi non ce l'ha non vede mai il sito.
+            Il perche' di tutto questo e' spiegato in lib/accesso.ts. */}
+        <script dangerouslySetInnerHTML={{ __html: scriptAccesso() }} />
+
         {/* Decide PRIMA del primo disegno se questa visita puo' essere animata.
             Se la pagina viene aperta in secondo piano (scheda nascosta, anteprima
             non in primo piano) il ticker di GSAP resta fermo: in quel caso non
@@ -68,10 +77,12 @@ export default function RootLayout({
         />
       </head>
       <body className="antialiased">
-        <ScrollMorbido>
-          <Header />
-          <main id="contenuto">{children}</main>
-        </ScrollMorbido>
+        <Accesso>
+          <ScrollMorbido>
+            <Header />
+            <main id="contenuto">{children}</main>
+          </ScrollMorbido>
+        </Accesso>
       </body>
     </html>
   );
